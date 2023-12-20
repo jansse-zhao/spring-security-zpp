@@ -16,20 +16,13 @@
 
 package org.springframework.security.config.annotation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.DelegatingFilterProxy;
+
+import java.util.*;
 
 /**
  * <p>
@@ -50,8 +43,7 @@ import org.springframework.web.filter.DelegatingFilterProxy;
  * @author Rob Winch
  * @see WebSecurity
  */
-public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBuilder<O>>
-		extends AbstractSecurityBuilder<O> {
+public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBuilder<O>> extends AbstractSecurityBuilder<O> {
 
 	private final Log logger = LogFactory.getLog(getClass());
 
@@ -95,6 +87,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	/**
 	 * Similar to {@link #build()} and {@link #getObject()} but checks the state to
 	 * determine if {@link #build()} needs to be called first.
+	 *
 	 * @return the result of {@link #build()} or {@link #getObject()}. If an error occurs
 	 * while building, returns null.
 	 */
@@ -104,8 +97,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 		}
 		try {
 			return build();
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			this.logger.debug("Failed to perform build. Returning null", ex);
 			return null;
 		}
@@ -114,6 +106,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	/**
 	 * Applies a {@link SecurityConfigurerAdapter} to this {@link SecurityBuilder} and
 	 * invokes {@link SecurityConfigurerAdapter#setBuilder(SecurityBuilder)}.
+	 *
 	 * @param configurer
 	 * @return the {@link SecurityConfigurerAdapter} for further customizations
 	 * @throws Exception
@@ -130,6 +123,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	 * Applies a {@link SecurityConfigurer} to this {@link SecurityBuilder} overriding any
 	 * {@link SecurityConfigurer} of the exact same class. Note that object hierarchies
 	 * are not considered.
+	 *
 	 * @param configurer
 	 * @return the {@link SecurityConfigurerAdapter} for further customizations
 	 * @throws Exception
@@ -141,8 +135,9 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 
 	/**
 	 * Sets an object that is shared by multiple {@link SecurityConfigurer}.
+	 *
 	 * @param sharedType the Class to key the shared object by.
-	 * @param object the Object to store
+	 * @param object     the Object to store
 	 */
 	@SuppressWarnings("unchecked")
 	public <C> void setSharedObject(Class<C> sharedType, C object) {
@@ -151,6 +146,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 
 	/**
 	 * Gets a shared Object. Note that object heirarchies are not considered.
+	 *
 	 * @param sharedType the type of the shared Object
 	 * @return the shared Object or null if it is not found
 	 */
@@ -161,6 +157,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 
 	/**
 	 * Gets the shared objects
+	 *
 	 * @return the shared Objects
 	 */
 	public Map<Class<?>, Object> getSharedObjects() {
@@ -170,13 +167,14 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	/**
 	 * Adds {@link SecurityConfigurer} ensuring that it is allowed and invoking
 	 * {@link SecurityConfigurer#init(SecurityBuilder)} immediately if necessary.
+	 *
 	 * @param configurer the {@link SecurityConfigurer} to add
 	 */
 	@SuppressWarnings("unchecked")
 	private <C extends SecurityConfigurer<O, B>> void add(C configurer) {
 		Assert.notNull(configurer, "configurer cannot be null");
 		Class<? extends SecurityConfigurer<O, B>> clazz = (Class<? extends SecurityConfigurer<O, B>>) configurer
-			.getClass();
+				.getClass();
 		synchronized (this.configurers) {
 			if (this.buildState.isConfigured()) {
 				throw new IllegalStateException("Cannot apply " + configurer + " to already built object");
@@ -197,6 +195,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	/**
 	 * Gets all the {@link SecurityConfigurer} instances by its class name or an empty
 	 * List if not found. Note that object hierarchies are not considered.
+	 *
 	 * @param clazz the {@link SecurityConfigurer} class to look for
 	 * @return a list of {@link SecurityConfigurer}s for further customization
 	 */
@@ -212,6 +211,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	/**
 	 * Removes all the {@link SecurityConfigurer} instances by its class name or an empty
 	 * List if not found. Note that object hierarchies are not considered.
+	 *
 	 * @param clazz the {@link SecurityConfigurer} class to look for
 	 * @return a list of {@link SecurityConfigurer}s for further customization
 	 */
@@ -228,6 +228,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	/**
 	 * Gets the {@link SecurityConfigurer} by its class name or <code>null</code> if not
 	 * found. Note that object hierarchies are not considered.
+	 *
 	 * @param clazz
 	 * @return the {@link SecurityConfigurer} for further customizations
 	 */
@@ -245,6 +246,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	/**
 	 * Removes and returns the {@link SecurityConfigurer} by its class name or
 	 * <code>null</code> if not found. Note that object hierarchies are not considered.
+	 *
 	 * @param clazz
 	 * @return
 	 */
@@ -266,6 +268,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 
 	/**
 	 * Specifies the {@link ObjectPostProcessor} to use.
+	 *
 	 * @param objectPostProcessor the {@link ObjectPostProcessor} to use. Cannot be null
 	 * @return the {@link SecurityBuilder} for further customizations
 	 */
@@ -279,6 +282,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	/**
 	 * Performs post processing of an object. The default is to delegate to the
 	 * {@link ObjectPostProcessor}.
+	 *
 	 * @param object the Object to post process
 	 * @return the possibly modified Object to use
 	 */
@@ -333,6 +337,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 
 	/**
 	 * Subclasses must implement this method to build the object that is being returned.
+	 *
 	 * @return the Object to be buit or null if the implementation allows it
 	 */
 	protected abstract O performBuild() throws Exception;
@@ -366,6 +371,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 
 	/**
 	 * Determines if the object is unbuilt.
+	 *
 	 * @return true, if unbuilt else false
 	 */
 	private boolean isUnbuilt() {
@@ -425,6 +431,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 
 		/**
 		 * Determines if the state is CONFIGURING or later
+		 *
 		 * @return
 		 */
 		public boolean isConfigured() {

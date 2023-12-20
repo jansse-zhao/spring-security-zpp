@@ -25,6 +25,8 @@ import org.springframework.util.StringUtils;
 /**
  * Offers static methods for directly manipulating fields.
  *
+ * 操作对象字段的工具类
+ *
  * @author Ben Alex
  */
 public final class FieldUtils {
@@ -34,6 +36,8 @@ public final class FieldUtils {
 
 	/**
 	 * Attempts to locate the specified field on the class.
+	 *
+	 * 获取类上定义的field，如果没有就递归向父类中找
 	 * @param clazz the class definition containing the field
 	 * @param fieldName the name of the field to locate
 	 * @return the Field (never null)

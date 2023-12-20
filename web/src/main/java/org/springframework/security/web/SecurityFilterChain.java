@@ -16,24 +16,29 @@
 
 package org.springframework.security.web;
 
-import java.util.List;
-
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Defines a filter chain which is capable of being matched against an
  * {@code HttpServletRequest}. in order to decide whether it applies to that request.
  * <p>
  * Used to configure a {@code FilterChainProxy}.
+ * <p>
+ *  TODO-ADMIN 核心组件security过滤器链
+ *  当前框架只有一个默认实现{@link DefaultSecurityFilterChain}
  *
  * @author Luke Taylor
  * @since 3.1
  */
 public interface SecurityFilterChain {
 
+
+	// 要能根据request判断是否匹配某个过滤器
 	boolean matches(HttpServletRequest request);
 
+	// 要能获取一个过滤器列表
 	List<Filter> getFilters();
 
 }

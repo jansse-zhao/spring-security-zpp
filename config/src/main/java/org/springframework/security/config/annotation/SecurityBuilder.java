@@ -19,6 +19,8 @@ package org.springframework.security.config.annotation;
 /**
  * Interface for building an Object
  *
+ * security构建器
+ *
  * @param <O> The type of the Object being built
  * @author Rob Winch
  * @since 3.2

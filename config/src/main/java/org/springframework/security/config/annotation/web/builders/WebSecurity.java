@@ -85,7 +85,8 @@ import org.springframework.web.filter.DelegatingFilterProxy;
  * @see EnableWebSecurity
  * @see WebSecurityConfiguration
  */
-public final class WebSecurity extends AbstractConfiguredSecurityBuilder<Filter, WebSecurity>
+public final class WebSecurity
+		extends AbstractConfiguredSecurityBuilder<Filter, WebSecurity>
 		implements SecurityBuilder<Filter>, ApplicationContextAware, ServletContextAware {
 
 	private final Log logger = LogFactory.getLog(getClass());

@@ -16,13 +16,14 @@
 
 package org.springframework.security.web.util.matcher;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Simple strategy to match an <tt>HttpServletRequest</tt>.
+ * <p>
+ * TODO-ADMIN request请求匹配器接口
  *
  * @author Luke Taylor
  * @author Eddú Meléndez
@@ -32,6 +33,7 @@ public interface RequestMatcher {
 
 	/**
 	 * Decides whether the rule implemented by the strategy matches the supplied request.
+	 *
 	 * @param request the request to check for a match
 	 * @return true if the request matches, false otherwise
 	 */
@@ -40,6 +42,7 @@ public interface RequestMatcher {
 	/**
 	 * Returns a MatchResult for this RequestMatcher The default implementation returns
 	 * {@link Collections#emptyMap()} when {@link MatchResult#getVariables()} is invoked.
+	 *
 	 * @return the MatchResult from comparing this RequestMatcher against the
 	 * HttpServletRequest
 	 * @since 5.2
@@ -77,6 +80,7 @@ public interface RequestMatcher {
 		/**
 		 * Returns the extracted variable values where the key is the variable name and
 		 * the value is the variable value
+		 *
 		 * @return a map containing key-value pairs representing extracted variable names
 		 * and variable values
 		 */
@@ -86,6 +90,7 @@ public interface RequestMatcher {
 
 		/**
 		 * Creates an instance of {@link MatchResult} that is a match with no variables
+		 *
 		 * @return
 		 */
 		public static MatchResult match() {
@@ -95,6 +100,7 @@ public interface RequestMatcher {
 		/**
 		 * Creates an instance of {@link MatchResult} that is a match with the specified
 		 * variables
+		 *
 		 * @param variables
 		 * @return
 		 */
@@ -104,6 +110,7 @@ public interface RequestMatcher {
 
 		/**
 		 * Creates an instance of {@link MatchResult} that is not a match.
+		 *
 		 * @return
 		 */
 		public static MatchResult notMatch() {

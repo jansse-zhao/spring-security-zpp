@@ -16,21 +16,21 @@
 
 package org.springframework.security.web;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.core.log.LogMessage;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import javax.servlet.Filter;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.Filter;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.core.log.LogMessage;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-
 /**
  * Standard implementation of {@code SecurityFilterChain}.
+ * <p>
+ * SecurityFilterChain 过滤器链的默认实现，也是唯一实现
  *
  * @author Luke Taylor
  * @since 3.1
@@ -50,8 +50,7 @@ public final class DefaultSecurityFilterChain implements SecurityFilterChain {
 	public DefaultSecurityFilterChain(RequestMatcher requestMatcher, List<Filter> filters) {
 		if (filters.isEmpty()) {
 			logger.info(LogMessage.format("Will not secure %s", requestMatcher));
-		}
-		else {
+		} else {
 			logger.info(LogMessage.format("Will secure %s with %s", requestMatcher, filters));
 		}
 		this.requestMatcher = requestMatcher;

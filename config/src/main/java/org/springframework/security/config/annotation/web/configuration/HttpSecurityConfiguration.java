@@ -16,10 +16,6 @@
 
 package org.springframework.security.config.annotation.web.configuration;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -41,10 +37,17 @@ import org.springframework.security.web.context.request.async.WebAsyncManagerInt
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * {@link Configuration} that exposes the {@link HttpSecurity} bean.
+ * <p>
+ * 用户通过@EnableWebSecurity注解import该类，该类初始化了HttpSecurity
+ * TODO 在{@link WebSecurityConfigurerAdapter}中的init()方法中也初始化了HttpSecurity
  *
  * @author Eleftheria Stein
  * @since 5.4
@@ -64,8 +67,7 @@ class HttpSecurityConfiguration {
 
 	private ApplicationContext context;
 
-	private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
-		.getContextHolderStrategy();
+	private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
 	private ContentNegotiationStrategy contentNegotiationStrategy = new HeaderContentNegotiationStrategy();
 
@@ -101,27 +103,32 @@ class HttpSecurityConfiguration {
 	@Bean(HTTPSECURITY_BEAN_NAME)
 	@Scope("prototype")
 	HttpSecurity httpSecurity() throws Exception {
-		WebSecurityConfigurerAdapter.LazyPasswordEncoder passwordEncoder = new WebSecurityConfigurerAdapter.LazyPasswordEncoder(
-				this.context);
+		// 通过spring上下文获取加密器，如果容器中不存在就创建PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		// 主要作用就是获取一个密码加密器
+		WebSecurityConfigurerAdapter.LazyPasswordEncoder passwordEncoder = new WebSecurityConfigurerAdapter.LazyPasswordEncoder(this.context);
+
+		// 构建默认加密器的认证管理器构建器
 		AuthenticationManagerBuilder authenticationBuilder = new WebSecurityConfigurerAdapter.DefaultPasswordEncoderAuthenticationManagerBuilder(
 				this.objectPostProcessor, passwordEncoder);
+		// 给认证管理器构建器设置父认证管理器
 		authenticationBuilder.parentAuthenticationManager(authenticationManager());
+		// 设置认证时间发布器
 		authenticationBuilder.authenticationEventPublisher(getAuthenticationEventPublisher());
 		HttpSecurity http = new HttpSecurity(this.objectPostProcessor, authenticationBuilder, createSharedObjects());
 		WebAsyncManagerIntegrationFilter webAsyncManagerIntegrationFilter = new WebAsyncManagerIntegrationFilter();
 		webAsyncManagerIntegrationFilter.setSecurityContextHolderStrategy(this.securityContextHolderStrategy);
 		// @formatter:off
 		http
-			.csrf(withDefaults())
-			.addFilter(webAsyncManagerIntegrationFilter)
-			.exceptionHandling(withDefaults())
-			.headers(withDefaults())
-			.sessionManagement(withDefaults())
-			.securityContext(withDefaults())
-			.requestCache(withDefaults())
-			.anonymous(withDefaults())
-			.servletApi(withDefaults())
-			.apply(new DefaultLoginPageConfigurer<>());
+				.csrf(withDefaults())
+				.addFilter(webAsyncManagerIntegrationFilter)
+				.exceptionHandling(withDefaults())
+				.headers(withDefaults())
+				.sessionManagement(withDefaults())
+				.securityContext(withDefaults())
+				.requestCache(withDefaults())
+				.anonymous(withDefaults())
+				.servletApi(withDefaults())
+				.apply(new DefaultLoginPageConfigurer<>());
 		http.logout(withDefaults());
 		// @formatter:on
 		applyDefaultConfigurers(http);
@@ -129,21 +136,23 @@ class HttpSecurityConfiguration {
 	}
 
 	private AuthenticationManager authenticationManager() throws Exception {
-		return (this.authenticationManager != null) ? this.authenticationManager
-				: this.authenticationConfiguration.getAuthenticationManager();
+		return (this.authenticationManager != null) ? this.authenticationManager : this.authenticationConfiguration.getAuthenticationManager();
 	}
 
+	// 获取一个认证事件发布器
 	private AuthenticationEventPublisher getAuthenticationEventPublisher() {
+		// spring容器中存在时直接返回
 		if (this.context.getBeanNamesForType(AuthenticationEventPublisher.class).length > 0) {
 			return this.context.getBean(AuthenticationEventPublisher.class);
 		}
+		// 否则返回个默认的
 		return this.objectPostProcessor.postProcess(new DefaultAuthenticationEventPublisher());
 	}
 
 	private void applyDefaultConfigurers(HttpSecurity http) throws Exception {
 		ClassLoader classLoader = this.context.getClassLoader();
 		List<AbstractHttpConfigurer> defaultHttpConfigurers = SpringFactoriesLoader
-			.loadFactories(AbstractHttpConfigurer.class, classLoader);
+				.loadFactories(AbstractHttpConfigurer.class, classLoader);
 		for (AbstractHttpConfigurer configurer : defaultHttpConfigurers) {
 			http.apply(configurer);
 		}

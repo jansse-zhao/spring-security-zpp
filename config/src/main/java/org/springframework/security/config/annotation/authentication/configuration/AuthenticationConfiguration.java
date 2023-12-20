@@ -16,15 +16,8 @@
 
 package org.springframework.security.config.annotation.authentication.configuration;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.target.LazyInitTargetSource;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -53,32 +46,33 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Exports the authentication {@link Configuration}
+ * <p>
+ * 认证配置类
  *
  * @author Rob Winch
  * @since 3.2
- *
  */
 @Configuration(proxyBeanMethods = false)
 @Import(ObjectPostProcessorConfiguration.class)
 public class AuthenticationConfiguration {
 
 	private AtomicBoolean buildingAuthenticationManager = new AtomicBoolean();
-
 	private ApplicationContext applicationContext;
-
 	private AuthenticationManager authenticationManager;
-
 	private boolean authenticationManagerInitialized;
-
 	private List<GlobalAuthenticationConfigurerAdapter> globalAuthConfigurers = Collections.emptyList();
-
 	private ObjectPostProcessor<Object> objectPostProcessor;
 
 	@Bean
-	public AuthenticationManagerBuilder authenticationManagerBuilder(ObjectPostProcessor<Object> objectPostProcessor,
-			ApplicationContext context) {
+	public AuthenticationManagerBuilder authenticationManagerBuilder(ObjectPostProcessor<Object> objectPostProcessor, ApplicationContext context) {
 		LazyPasswordEncoder defaultPasswordEncoder = new LazyPasswordEncoder(context);
 		AuthenticationEventPublisher authenticationEventPublisher = getAuthenticationEventPublisher(context);
 		DefaultPasswordEncoderAuthenticationManagerBuilder result = new DefaultPasswordEncoderAuthenticationManagerBuilder(
@@ -90,24 +84,22 @@ public class AuthenticationConfiguration {
 	}
 
 	@Bean
-	public static GlobalAuthenticationConfigurerAdapter enableGlobalAuthenticationAutowiredConfigurer(
-			ApplicationContext context) {
+	public static GlobalAuthenticationConfigurerAdapter enableGlobalAuthenticationAutowiredConfigurer(ApplicationContext context) {
 		return new EnableGlobalAuthenticationAutowiredConfigurer(context);
 	}
 
 	@Bean
-	public static InitializeUserDetailsBeanManagerConfigurer initializeUserDetailsBeanManagerConfigurer(
-			ApplicationContext context) {
+	public static InitializeUserDetailsBeanManagerConfigurer initializeUserDetailsBeanManagerConfigurer(ApplicationContext context) {
 		return new InitializeUserDetailsBeanManagerConfigurer(context);
 	}
 
 	@Bean
-	public static InitializeAuthenticationProviderBeanManagerConfigurer initializeAuthenticationProviderBeanManagerConfigurer(
-			ApplicationContext context) {
+	public static InitializeAuthenticationProviderBeanManagerConfigurer initializeAuthenticationProviderBeanManagerConfigurer(ApplicationContext context) {
 		return new InitializeAuthenticationProviderBeanManagerConfigurer(context);
 	}
 
 	public AuthenticationManager getAuthenticationManager() throws Exception {
+		// 认证管理器已经初始化过，则返回现有的认证管理器
 		if (this.authenticationManagerInitialized) {
 			return this.authenticationManager;
 		}
@@ -168,7 +160,7 @@ public class AuthenticationConfiguration {
 
 	private <T> String getBeanName(Class<T> interfaceName, String[] beanNamesForType) {
 		if (beanNamesForType.length == 1) {
-			return beanNamesForType[0];
+			return beanNamesForType[ 0 ];
 		}
 		List<String> primaryBeanNames = getPrimaryBeanNames(beanNamesForType);
 		Assert.isTrue(primaryBeanNames.size() != 0, () -> "Found " + beanNamesForType.length + " beans for type "
@@ -185,8 +177,8 @@ public class AuthenticationConfiguration {
 		}
 		for (String beanName : beanNamesForType) {
 			if (((ConfigurableApplicationContext) this.applicationContext).getBeanFactory()
-				.getBeanDefinition(beanName)
-				.isPrimary()) {
+					.getBeanDefinition(beanName)
+					.isPrimary()) {
 				list.add(beanName);
 			}
 		}
@@ -200,8 +192,7 @@ public class AuthenticationConfiguration {
 	private static <T> T getBeanOrNull(ApplicationContext applicationContext, Class<T> type) {
 		try {
 			return applicationContext.getBean(type);
-		}
-		catch (NoSuchBeanDefinitionException notFound) {
+		} catch (NoSuchBeanDefinitionException notFound) {
 			return null;
 		}
 	}
@@ -219,7 +210,7 @@ public class AuthenticationConfiguration {
 		@Override
 		public void init(AuthenticationManagerBuilder auth) {
 			Map<String, Object> beansWithAnnotation = this.context
-				.getBeansWithAnnotation(EnableGlobalAuthentication.class);
+					.getBeansWithAnnotation(EnableGlobalAuthentication.class);
 			if (logger.isTraceEnabled()) {
 				logger.trace(LogMessage.format("Eagerly initializing %s", beansWithAnnotation));
 			}
@@ -274,6 +265,7 @@ public class AuthenticationConfiguration {
 
 		/**
 		 * Creates a new instance
+		 *
 		 * @param objectPostProcessor the {@link ObjectPostProcessor} instance to use.
 		 */
 		DefaultPasswordEncoderAuthenticationManagerBuilder(ObjectPostProcessor<Object> objectPostProcessor,
